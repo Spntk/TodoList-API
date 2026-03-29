@@ -55,12 +55,13 @@ public class TodoModel {
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-    private boolean isDeleted = false;
+    private Boolean isDeleted;
     private LocalDateTime deletedAt;
 
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now().withNano(0);
+        isDeleted = false;
     }
 
     public Long getId() {
@@ -121,5 +122,17 @@ public class TodoModel {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public void setUser(UserModel user) {
+        this.user = user;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public void setIsDeleted(Boolean isDeleted) {
+        this.isDeleted = isDeleted;
     }
 }
