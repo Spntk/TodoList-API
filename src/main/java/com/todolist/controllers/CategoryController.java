@@ -56,4 +56,11 @@ public class CategoryController {
         return ResponseEntity.noContent().build();
     }
 
+    @PostMapping("/bulk-delete")
+    public ResponseEntity<Void> bulkDeleteCategory(HttpServletRequest request, @RequestBody List<Long> ids) {
+        Long userId = (Long) request.getAttribute("userId");
+        categoryService.bulkDelete(ids, userId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

@@ -8,9 +8,10 @@ public class TodoDto {
     private String priority;
     private String status;
     private String dueDate;
+    private String createdAt;
 
     public TodoDto(Long id, String title, String description, CategoryDto category, String priority, String status,
-            String dueDate) {
+            String dueDate, String createdAt) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -18,6 +19,11 @@ public class TodoDto {
         this.priority = priority;
         this.status = status;
         this.dueDate = dueDate;
+        this.createdAt = createdAt;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
     }
 
     public CategoryDto getCategory() {

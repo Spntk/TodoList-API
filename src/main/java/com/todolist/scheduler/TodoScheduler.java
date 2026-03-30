@@ -19,6 +19,7 @@ public class TodoScheduler {
     @Scheduled(cron = "0 0 0 * * *")
     public void hardDeleteExpiredTodos() {
         LocalDateTime expiredDate = LocalDateTime.now().minusDays(7);
+        System.out.println("Scheduler running... expiredDate: " + expiredDate);
         todoRepository.deleteByIsDeletedTrueAndDeletedAtBefore(expiredDate);
     }
 }

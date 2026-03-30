@@ -135,4 +135,12 @@ public class TodoModel {
     public void setIsDeleted(Boolean isDeleted) {
         this.isDeleted = isDeleted;
     }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
 }

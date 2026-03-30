@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.todolist.dtos.TodoDto;
 import com.todolist.dtos.TodoRequestDto;
+import com.todolist.dtos.TrashtodoDto;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -36,6 +37,12 @@ public class TodoController {
         return ResponseEntity.ok(todoService.getTodoById(userId));
     }
 
+    @GetMapping("/trash")
+    public ResponseEntity<List<TrashtodoDto>> getTrashTodoById(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        return ResponseEntity.ok(todoService.getTrashTodoById(userId));
+    }
+
     @PostMapping
     public ResponseEntity<TodoDto> createTodo(HttpServletRequest request,
             @RequestBody @Valid TodoRequestDto todoRequestDto) {
@@ -57,4 +64,33 @@ public class TodoController {
         todoService.softDeleteTodo(id, userId);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/permanent/{id}")
+    public ResponseEntity<Void> hardDeleteTodo(HttpServletRequest request, @PathVariable Long id) {
+        Long userId = (Long) request.getAttribute("userId");
+        todoService.hardDeleteTodo(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/recovery/{id}")
+    public ResponseEntity<Void> recoveryTodo(HttpServletRequest request, @PathVariable Long id) {
+        Long userId = (Long) request.getAttribute("userId");
+        todoService.recoveryTodo(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/bulk-recovery")
+    public ResponseEntity<Void> bulkRecoveryTodo(HttpServletRequest request, @RequestBody List<Long> ids) {
+        Long userId = (Long) request.getAttribute("userId");
+        todoService.bulkRecoveryTodo(ids, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/bulk-delete")
+    public ResponseEntity<Void> bulkDeleteTodo(HttpServletRequest request, @RequestBody List<Long> ids) {
+        Long userId = (Long) request.getAttribute("userId");
+        todoService.bulkDeleteTodo(ids, userId);
+        return ResponseEntity.noContent().build();
+    }
+
 }

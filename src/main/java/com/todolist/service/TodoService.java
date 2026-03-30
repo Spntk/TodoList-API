@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.todolist.dtos.CategoryDto;
 import com.todolist.dtos.TodoDto;
 import com.todolist.dtos.TodoRequestDto;
+import com.todolist.dtos.TrashtodoDto;
 import com.todolist.models.CategoryModel;
 import com.todolist.models.TodoModel;
 import com.todolist.models.UserModel;
@@ -33,7 +34,7 @@ public class TodoService {
         this.categoryRepository = categoryRepository;
     }
 
-    private TodoDto toDto(TodoModel todo) {
+    public TodoDto toDto(TodoModel todo) {
         CategoryDto categoryDto = null;
         if (todo.getCategory() != null) {
             categoryDto = new CategoryDto(
@@ -49,7 +50,8 @@ public class TodoService {
                 categoryDto,
                 todo.getPriority().name(),
                 todo.getStatus().name(),
-                todo.getDueDate().toString());
+                todo.getDueDate().toString(),
+                todo.getCreatedAt().toString());
     }
 
     @Transactional
@@ -66,7 +68,22 @@ public class TodoService {
                                 todo.getCategory().getCreatedAt()) : null,
                         todo.getPriority().name(),
                         todo.getStatus().name(),
-                        todo.getDueDate().toString()))
+                        todo.getDueDate().toString(),
+                        todo.getCreatedAt().toString()))
+                .toList();
+    }
+
+    public List<TrashtodoDto> getTrashTodoById(Long userId) {
+        return todoRepository.findByUserIdAndIsDeletedTrue(userId)
+                .stream()
+                .map(trash -> new TrashtodoDto(
+                        trash.getId(),
+                        trash.getTitle(),
+                        trash.getDescription(),
+                        trash.getPriority(),
+                        trash.getStatus(),
+                        trash.getDueDate().toString(),
+                        trash.getDeletedAt().toString()))
                 .toList();
     }
 
@@ -121,5 +138,40 @@ public class TodoService {
         todoModel.setIsDeleted(true);
         todoModel.setDeletedAt(LocalDateTime.now().withNano(0));
         todoRepository.save(todoModel);
+    }
+
+    public void recoveryTodo(Long todoId, Long userId) {
+        TodoModel todoModel = todoRepository.findByIdAndUserId(todoId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recovery not found"));
+
+        todoModel.setIsDeleted(false);
+        todoModel.setDeletedAt(null);
+        todoRepository.save(todoModel);
+    }
+
+    public void bulkDeleteTodo(List<Long> ids, Long userId) {
+        ids.forEach(id -> {
+            TodoModel todoModel = todoRepository.findByIdAndUserIdAndIsDeletedFalse(id, userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Delete not found"));
+            todoModel.setIsDeleted(true);
+            todoModel.setDeletedAt(LocalDateTime.now().withNano(0));
+            todoRepository.save(todoModel);
+        });
+    }
+
+    public void bulkRecoveryTodo(List<Long> ids, Long userId) {
+        ids.forEach(id -> {
+            TodoModel todoModel = todoRepository.findByIdAndUserIdAndIsDeletedTrue(id, userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Recovery not found"));
+            todoModel.setIsDeleted(false);
+            todoModel.setDeletedAt(null);
+            todoRepository.save(todoModel);
+        });
+    }
+
+    public void hardDeleteTodo(Long todoId, Long userId) {
+        TodoModel todoModel = todoRepository.findByIdAndUserIdAndIsDeletedTrue(todoId, userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
+        todoRepository.delete(todoModel);
     }
 }

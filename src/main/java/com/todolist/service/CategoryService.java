@@ -11,17 +11,23 @@ import com.todolist.dtos.CategoryRequestDto;
 import com.todolist.models.CategoryModel;
 import com.todolist.models.UserModel;
 import com.todolist.repositories.CategoryRepository;
+import com.todolist.repositories.TodoRepository;
 import com.todolist.repositories.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final TodoRepository todoRepository;
 
-    public CategoryService(CategoryRepository categoryRepository, UserRepository userRepository) {
+    public CategoryService(CategoryRepository categoryRepository, UserRepository userRepository,
+            TodoRepository todoRepository) {
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.todoRepository = todoRepository;
     }
 
     private static final List<String> DEFUALT_CATEGORIES = List.of(
@@ -71,10 +77,21 @@ public class CategoryService {
         return new CategoryDto(saved.getId(), saved.getCategoryName(), saved.getCreatedAt());
     }
 
+    public void bulkDelete(List<Long> ids, Long userId) {
+        ids.forEach(id -> {
+            CategoryModel categoryModel = categoryRepository.findByIdAndUserId(id, userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
+            todoRepository.updateCategoryToNull(id);
+            categoryRepository.delete(categoryModel);
+        });
+    }
+
+    @Transactional
     public void deleteCategory(Long categoryId, Long userId) {
         CategoryModel categoryModel = categoryRepository.findByIdAndUserId(categoryId, userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found"));
 
+        todoRepository.updateCategoryToNull(categoryId);
         categoryRepository.delete(categoryModel);
     }
 }
