@@ -36,7 +36,7 @@ A full-stack todo management application built with Spring Boot and Next.js.
 
 \`\`\`bash
 # 1. Clone repository
-git clone https://github.com/username/taskflow.git
+git clone [https://github.com/username/taskflow.git](https://github.com/Spntk/TodoList-Frontend.git)
 cd taskflow
 
 # 2. Build backend image
