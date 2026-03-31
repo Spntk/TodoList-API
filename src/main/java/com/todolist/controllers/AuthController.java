@@ -53,7 +53,7 @@ public class AuthController {
         userRepository.save(user);
         categoryService.createDefualtCategories(user);
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(user, false);
 
         Map<String, String> response = new HashMap<>();
         response.put("token", token);
@@ -79,7 +79,7 @@ public class AuthController {
                     "Your account has been suspended, Please contact admin");
         }
 
-        String token = jwtService.generateToken(user);
+        String token = jwtService.generateToken(user, authDto.isKeepSignedIn());
 
         Map<String, String> response = new HashMap<>();
         response.put("token", token);

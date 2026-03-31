@@ -17,13 +17,16 @@ public class AuthDto {
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$", message = "Password must contain uppercase, lowercase, and a number")
     private String password;
 
+    private boolean keepSignedIn;
+
     public AuthDto() {
 
     }
 
-    public AuthDto(String email, String password) {
+    public AuthDto(String email, String password, boolean keepSignedIn) {
         this.email = email;
         this.password = password;
+        this.keepSignedIn = keepSignedIn;
     }
 
     public AuthDto(String name, String email, String password) {
@@ -42,5 +45,9 @@ public class AuthDto {
 
     public String getPassword() {
         return password;
+    }
+
+    public boolean isKeepSignedIn() {
+        return keepSignedIn;
     }
 }

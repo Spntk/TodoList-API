@@ -21,17 +21,21 @@ public class JwtService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String generateToken(UserModel user) {
+    public String generateToken(UserModel user, boolean keepSignedIn) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("id", user.getId());
         claims.put("role", user.getRole());
         claims.put("name", user.getName());
 
+        long expiration = keepSignedIn
+                ? 1000L * 60 * 60 * 24 * 30
+                : 1000L * 60 * 60 * 24;
+
         return Jwts.builder()
                 .claims(claims)
                 .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
                 .compact();
     }
