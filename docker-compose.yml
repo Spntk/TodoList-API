@@ -1,0 +1,38 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: todolist-db
+    environment:
+      POSTGRES_DB: db_project_todolist
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    image: todolist-backend
+    container_name: todolist-backend
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/db_project_todolist
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+      JWT_SECRET: this-is-very-2p#<(|R%*CVYCNxg-secret-key-MT:3-K;(-|OfDJK>
+    depends_on:
+      - postgres
+
+  frontend:
+    image: todolist-frontend
+    container_name: todolist-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://backend:8080
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
