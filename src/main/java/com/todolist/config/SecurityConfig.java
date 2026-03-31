@@ -43,9 +43,9 @@ public class SecurityConfig {
             "https://todo-list-frontend-seven-steel.vercel.app"
         ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowAllHeaders(true); 
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
-
+        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
